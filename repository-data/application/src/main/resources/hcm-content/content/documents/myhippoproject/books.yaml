@@ -1,19 +1,5 @@
 /content/documents/myhippoproject/books:
   jcr:primaryType: nt:unstructured
-  /4f5db9d5-f562-4bd3-8460-bb6f784011a6:
-    jcr:primaryType: nt:unstructured
-    author: testauthor1232
-    introduction: introduction2
-    isbn: testISBN
-    name: testName21231
-    paragraphs: bbbbbbbbb 123123 12312312 12312
-  /469413ce-ff51-4665-a526-7c49e20a7c88:
-    jcr:primaryType: nt:unstructured
-    author: testauthor
-    introduction: introduction
-    isbn: testISBN
-    name: testName132
-    paragraphs: paragraphs
   /0e430e47-d816-41ec-8944-2405f1ebcb8d:
     jcr:primaryType: nt:unstructured
     author: testauthor1232
@@ -57,6 +43,20 @@
     name: testName132
     paragraphs: paragraphs
   /39bd5943-5e80-4529-8463-e869babf924b:
+    jcr:primaryType: nt:unstructured
+    author: testauthor1232
+    introduction: introduction2
+    isbn: testISBN
+    name: testName21231
+    paragraphs: bbbbbbbbb 123123 12312312 12312
+  /f3079667-18d0-44e9-8948-3c6fb0b97b59:
+    jcr:primaryType: nt:unstructured
+    author: testauthor
+    introduction: introduction
+    isbn: testISBN
+    name: testName132
+    paragraphs: paragraphs
+  /101bfe22-30ca-4e68-acb9-71299cac8409:
     jcr:primaryType: nt:unstructured
     author: testauthor1232
     introduction: introduction2

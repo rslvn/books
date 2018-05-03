@@ -9,9 +9,9 @@ RemoteSystemsTempFiles/
 */.project
 target/
 */target/
-
+*/*.log
 */*.iml
 myhippoproject.iml
-
+*/*/*.iml
 */.classpath
 .classpath
