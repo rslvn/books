@@ -1,0 +1,18 @@
+definitions:
+  config:
+    /hippo:configuration/hippo:modules/hello-module:
+      jcr:primaryType: hipposys:module
+      hipposys:className: org.example.assessment.HelloModule
+      /hippo:moduleconfig:
+        jcr:primaryType: nt:unstructured
+        exampleConfigurationOption: exampleConfigurationOptionValue
+    /hippo:configuration/hippo:modules/book-store-module:
+      jcr:primaryType: hipposys:module
+      hipposys:className: org.example.assessment.BookStoreModule
+      /hippo:moduleconfig:
+        jcr:primaryType: nt:unstructured
+    /hippo:configuration/hippo:modules/book-module:
+      jcr:primaryType: hipposys:module
+      hipposys:className: org.example.assessment.BookModule
+      /hippo:moduleconfig:
+        jcr:primaryType: nt:unstructured

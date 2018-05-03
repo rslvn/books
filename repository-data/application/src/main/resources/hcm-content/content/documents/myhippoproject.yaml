@@ -1,0 +1,8 @@
+/content/documents/myhippoproject:
+  jcr:primaryType: hippostd:folder
+  jcr:mixinTypes: ['hippo:named', 'hippotranslation:translated', 'mix:referenceable']
+  jcr:uuid: 244951b4-b1f4-4df5-9699-ebc282421f17
+  hippo:name: My Hippo Project
+  hippostd:foldertype: [new-translated-folder, new-document]
+  hippotranslation:id: 996bcac5-86cf-49b5-a7a3-16a74863e814
+  hippotranslation:locale: en
