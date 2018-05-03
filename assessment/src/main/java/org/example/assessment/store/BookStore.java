@@ -11,7 +11,6 @@ import javax.jcr.observation.EventListener;
 import org.example.assessment.common.Constants;
 import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
-import org.example.assessment.util.BookUtil;
 import org.example.assessment.util.Preconditions;
 import org.example.assessment.util.RepositoryUtil;
 import org.slf4j.Logger;
@@ -41,19 +40,16 @@ public class BookStore {
 				switch (e.getType()) {
 				case Event.NODE_ADDED:
 					String bookId = getBookIdFromNodePath(e.getPath());
-					log.debug("{} is added", bookId);
 					loadBook(bookId);
 					break;
 
 				case Event.NODE_REMOVED:
 					bookId = getBookIdFromNodePath(e.getPath());
-					log.debug("{} is removed", bookId);
-					bookList.remove(BookUtil.toBook(bookId));
+					removeBook(bookId);
 					break;
 
 				case Event.PROPERTY_CHANGED:
 					bookId = getBookIdFromPropertyPath(e.getPath());
-					log.debug("{} is changed", bookId);
 					updateBook(bookId);
 					break;
 
@@ -108,6 +104,16 @@ public class BookStore {
 	/**
 	 * @param bookId
 	 */
+	private void removeBook(String bookId) {
+		List<Book> deletedBookList = bookList.parallelStream().filter(b -> b.getBookId().equals(bookId))
+				.collect(Collectors.toList());
+		bookList.removeAll(deletedBookList);
+		log.debug("{} deleted by bookId {} is removed", deletedBookList.size(), bookId);
+	}
+
+	/**
+	 * @param bookId
+	 */
 	private void updateBook(String bookId) {
 		try {
 			Book book = RepositoryUtil.getBook(session, bookId);
@@ -127,6 +133,8 @@ public class BookStore {
 			Book storedBook = filteredBook.get(0);
 			bookList.set(bookList.indexOf(storedBook), book);
 
+            log.debug("{} is changed", bookId);
+
 		} catch (Exception e) {
 			log.error("Error while loadBooks", e);
 		} finally {
@@ -135,19 +143,19 @@ public class BookStore {
 	}
 
 	/**
-	 * @param bookName
+	 * @param bookId
 	 */
-	private void loadBook(String bookName) {
+	private void loadBook(String bookId) {
 		try {
-			Book book = RepositoryUtil.getBook(session, bookName);
-			log.debug("Book exist with {}: {}", bookName, bookList.contains(BookUtil.toBook(bookName)));
+			Book book = RepositoryUtil.getBook(session, bookId);
 			if (book != null) {
 				bookList.add(book);
+				log.debug("{} is added", bookId);
 			}
 		} catch (Exception e) {
 			log.error("Error while loadBooks", e);
 		} finally {
-			log.debug("{} book(s) loaded", bookList.size());
+			log.debug("{} book(s) stored", bookList.size());
 		}
 	}
 
@@ -164,15 +172,6 @@ public class BookStore {
 		} finally {
 			log.debug("{} book(s) loaded", bookList.size());
 		}
-	}
-
-	/**
-	 * @param list
-	 * @param name
-	 * @return
-	 */
-	public List<Book> containsBook(List<Book> list, String bookId) {
-		return list.stream().filter(o -> o.getBookId().equals(bookId)).collect(Collectors.toList());
 	}
 
 	/**

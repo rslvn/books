@@ -20,17 +20,6 @@ public class BookUtil {
 	}
 
 	/**
-	 * @param bookId
-	 * @return
-	 */
-	public static Book toBook(String bookId) {
-		Book book = new Book();
-		book.setBookId(bookId);
-
-		return book;
-	}
-
-	/**
 	 * Converts node to Book. It throws a BookException If something is wrong
 	 *
 	 * @param node

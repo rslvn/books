@@ -2,9 +2,8 @@
 .metadata/
 RemoteSystemsTempFiles/
 .settings/
+*/.settings/
 .recommenders/
-
-env/bin/
 
 .project
 */.project
@@ -16,4 +15,3 @@ myhippoproject.iml
 
 */.classpath
 .classpath
-*/*.log
