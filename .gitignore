@@ -10,8 +10,8 @@ RemoteSystemsTempFiles/
 target/
 */target/
 */*.log
-*/*.iml
+**/*.iml
 myhippoproject.iml
-*/*/*.iml
 */.classpath
 .classpath
+**/*.lock
