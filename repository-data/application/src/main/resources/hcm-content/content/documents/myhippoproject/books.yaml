@@ -1,12 +1,5 @@
 /content/documents/myhippoproject/books:
   jcr:primaryType: nt:unstructured
-  /d8abc466-9a4b-485e-8ba9-ff90dbd1a6f1:
-    jcr:primaryType: nt:unstructured
-    author: testauthor4
-    introduction: introductio4
-    isbn: testISBN3
-    name: testName14
-    paragraphs: paragraphs3
   /4f5db9d5-f562-4bd3-8460-bb6f784011a6:
     jcr:primaryType: nt:unstructured
     author: testauthor1232
