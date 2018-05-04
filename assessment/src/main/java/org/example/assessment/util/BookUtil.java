@@ -8,8 +8,6 @@ import javax.jcr.RepositoryException;
 
 import org.example.assessment.common.BookField;
 import org.example.assessment.model.Book;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
@@ -24,9 +22,9 @@ public class BookUtil {
 	/**
 	 * Converts nodeIterator to Book list.
 	 *
-	 * @param nodeIterator
+	 * @param nodeIterator nodes in iterator
 	 * @return a {@link Book} instance
-	 * @throws RepositoryException 
+	 * @throws RepositoryException as generic exception
 	 */
 	public static List<Book> toBookList(NodeIterator nodeIterator) throws RepositoryException {
 		List<Book> books = Lists.newArrayList();
@@ -39,9 +37,9 @@ public class BookUtil {
 	/**
 	 * Converts node to Book.
 	 *
-	 * @param node
+	 * @param node book node
 	 * @return a {@link Book} instance
-	 * @throws RepositoryException
+	 * @throws RepositoryException as generic exception
 	 */
 	public static Book toBook(Node node) throws RepositoryException {
 		Book book = new Book();
@@ -58,9 +56,9 @@ public class BookUtil {
 	/**
 	 * Converts Book to node.
 	 * 
-	 * @param book
-	 * @param bookNode
-	 * @throws RepositoryException
+	 * @param book book instance
+	 * @param bookNode book node
+	 * @throws RepositoryException as generic exception
 	 */
 	public static void toNode(Book book, Node bookNode) throws RepositoryException {
 		bookNode.setProperty(BookField.NAME.getFieldName(), book.getName());
