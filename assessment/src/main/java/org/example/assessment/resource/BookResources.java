@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
 import org.example.assessment.service.BookService;
+import org.example.assessment.store.BookObservator;
 import org.example.assessment.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +28,20 @@ import com.google.common.collect.Lists;
  */
 public class BookResources {
 
+	public static final String SERVICE_PATH = "/books";
+	public static final String METHOD_GET_ADD_BOOK = "/";
+	public static final String METHOD_SEARCH_BOOK = "/search";
+	public static final String METHOD_DELETE_BOOK = "/delete";
+	public static final String METHOD_UPDATE_BOOK = "/update";
+
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 
 	private final BookService bookService;
 
-	public BookResources(Session systemSession) {
-		bookService = new BookService(systemSession);
+	public BookResources(Session session) {
+		bookService = new BookService(session);
 
+		BookObservator.newBuilder().withSession(session).build();
 	}
 
 	/**
@@ -43,25 +51,22 @@ public class BookResources {
 	 *            as list of {@link Book}
 	 * @return true/false
 	 */
-	@Path("/")
+	@Path(METHOD_GET_ADD_BOOK)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@POST
 	public boolean addBooks(List<Book> books) {
 		try {
 			log.debug("addBooks service is called.");
+			// constraint check
 			Preconditions.checkNotEmpty(books, "books can not be empty");
 			books.forEach(b -> {
-				Preconditions.checkNotEmpty(b.getName(), "book name can not be empty");
-				Preconditions.checkNotEmpty(b.getAuthor(), "book author can not be empty");
-				Preconditions.checkNotEmpty(b.getIsbn(), "book ISBN can not be empty");
-				Preconditions.checkNotEmpty(b.getIntroduction(), "book introduction can not be empty");
-				Preconditions.checkNotEmpty(b.getParagraphs(), "book parapraphs can not be empty");
+				validateBook(b);
 				b.setBookId(UUID.randomUUID().toString());
 			});
 
 			log.debug("Book size: {}", books.size());
-
+			// call service
 			bookService.saveBooks(books);
 
 			return true;
@@ -82,20 +87,20 @@ public class BookResources {
 	 *
 	 * @return list of {@link Book}
 	 */
-	@Path("/")
+	@Path(METHOD_GET_ADD_BOOK)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
 	public List<Book> getBooks() {
 		try {
-			log.info("listBooks service is called");
+			log.debug("getBooks service is called");
 			return bookService.getBooks();
 		} catch (BookException e) {
 			log.error("", e);
 		} catch (Exception e) {
-			log.error("", BookException.newInstance("Error while listBooks", e));
+			log.error("", BookException.newInstance("Error while getBooks", e));
 		} finally {
-			log.debug("listBooks executed");
+			log.debug("getBooks executed");
 		}
 
 		return Lists.newArrayList();
@@ -108,15 +113,19 @@ public class BookResources {
 	 *            as search text
 	 * @return list of {@link Book}
 	 */
-	@Path("/search/{query}")
+	@Path(METHOD_SEARCH_BOOK + "/{query}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
 	public List<Book> searchBooks(@PathParam("query") String query) {
 		try {
-			log.info("searchBooks service is called");
+			log.debug("searchBooks service is called");
+			// constraint check
 			Preconditions.checkNotEmpty(query, "query text not be empty");
+
+			// call service
 			return bookService.queryBooks(query);
+
 		} catch (BookException e) {
 			log.error("", e);
 		} catch (Exception e) {
@@ -131,18 +140,20 @@ public class BookResources {
 	/**
 	 * Searches books in repository containing text
 	 *
-	 * @param query
-	 *            as search text
+	 * @param bookId
+	 *            as bookId
 	 * @return list of {@link Book}
 	 */
-	@Path("/delete/{bookId}")
+	@Path(METHOD_DELETE_BOOK + "/{bookId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@DELETE
 	public boolean deleteBook(@PathParam("bookId") String bookId) {
 		try {
-			log.info("deleteBook service is called");
+			log.debug("deleteBook service is called");
+			// constraint check
 			Preconditions.checkNotEmpty(bookId, "bookId not be empty");
+			// call service
 			bookService.deleteBook(bookId);
 			return true;
 		} catch (BookException e) {
@@ -163,24 +174,23 @@ public class BookResources {
 	 *            as list of {@link Book}
 	 * @return true/false
 	 */
-	@Path("/update")
+	@Path(METHOD_UPDATE_BOOK)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@POST
 	public boolean updateBook(Book book) {
 		try {
 			log.debug("updateBook service is called.");
+			// constraint check
 			Preconditions.checkNotNull(book, "books can not be null");
-
 			Preconditions.checkNotEmpty(book.getBookId(), "book ID name can not be empty");
-			Preconditions.checkNotNull(book.getName(), "book name can not be empty");
-			Preconditions.checkNotNull(book.getAuthor(), "book author can not be empty");
-			Preconditions.checkNotNull(book.getIsbn(), "book ISBN can not be empty");
-			Preconditions.checkNotNull(book.getIntroduction(), "book introduction can not be empty");
-			Preconditions.checkNotNull(book.getParagraphs(), "book parapraphs can not be empty");
+			validateBook(book);
 
+			// call service
 			bookService.updateBook(book);
+
 			return true;
+
 		} catch (BookException e) {
 			log.error("", e);
 		} catch (Exception e) {
@@ -190,5 +200,16 @@ public class BookResources {
 		}
 
 		return false;
+	}
+
+	/** validate a book parameters
+	 * @param book
+	 */
+	private void validateBook(Book book) {
+		Preconditions.checkNotEmpty(book.getName(), "book name can not be empty");
+		Preconditions.checkNotEmpty(book.getAuthor(), "book author can not be empty");
+		Preconditions.checkNotEmpty(book.getIsbn(), "book ISBN can not be empty");
+		Preconditions.checkNotEmpty(book.getIntroduction(), "book introduction can not be empty");
+		Preconditions.checkNotEmpty(book.getParagraphs(), "book parapraphs can not be empty");
 	}
 }

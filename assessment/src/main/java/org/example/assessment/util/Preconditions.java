@@ -16,6 +16,18 @@ public class Preconditions {
 	}
 
 	/**
+	 * Ensures the truth of an expression involving one or more parameters to the calling method.
+	 *
+	 * @param expression
+	 * @param errorMessage
+	 */
+	public static void checkArgument(boolean expression, String errorMessage) {
+		if (!expression) {
+			throw BookException.newInstance(errorMessage);
+		}
+	}
+
+	/**
 	 * Ensures that an object reference passed as a parameter to the calling
 	 * method is not null.
 	 *

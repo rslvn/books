@@ -2,7 +2,6 @@ package org.example.assessment.resource;
 
 import java.util.List;
 
-import javax.jcr.Session;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -11,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
-import org.example.assessment.store.BookStore;
+import org.example.assessment.store.BookCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +21,12 @@ import com.google.common.collect.Lists;
  */
 public class BookStoreResources {
 
+	public static final String SERVICE_PATH = "/bookstore";
+	public static final String METHOD_GET_BOOK = "/";
+
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 
-	private final BookStore bookStore;
-
-	public BookStoreResources(Session session) {
-		bookStore = BookStore.newBuilder().withSession(session).build();
+	public BookStoreResources() {
 	}
 
 	/**
@@ -35,24 +34,27 @@ public class BookStoreResources {
 	 *
 	 * @return list of {@link Book}
 	 */
-	@Path("/")
+	@Path(METHOD_GET_BOOK)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
-	public List<Book> getBooks() {
-		List<Book> bookList;
+	public List<Book> getStoredBooks() {
 		try {
-			log.info("listBooks service is called");
-			bookList = bookStore.getBookList();
+			log.debug("getStoredBooks service is called");
+
+			List<Book> bookList = BookCache.getInstance().getBookList();
+
+			log.debug("{} stored book(s) found", bookList.size());
+
+			return bookList;
 		} catch (BookException e) {
-			bookList = Lists.newArrayList();
 			log.error("", e);
 		} catch (Exception e) {
-			bookList = Lists.newArrayList();
-			log.error("", BookException.newInstance("Error while listBooks", e));
+			log.error("", BookException.newInstance("Error while getStoredBooks", e));
 		} finally {
-			log.debug("listBooks executed");
+			log.debug("getStoredBooks executed");
 		}
-		return bookList;
+
+		return Lists.newArrayList();
 	}
 }

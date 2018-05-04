@@ -13,6 +13,7 @@ import javax.jcr.query.QueryResult;
 import org.example.assessment.common.BookField;
 import org.example.assessment.model.Book;
 import org.example.assessment.util.BookUtil;
+import org.example.assessment.util.Preconditions;
 import org.example.assessment.util.RepositoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public class BookService {
 		Node booksNode = RepositoryUtil.getBooksNode(session);
 
 		NodeIterator nodeIterator = booksNode.getNodes(bookId);
-		log.debug("{} book(s) found with bookId: {}", nodeIterator.getSize(), bookId);
+		Preconditions.checkArgument(nodeIterator.getSize() > 0, String.format("no book found by bookId: %s", bookId));
 
 		while (nodeIterator.hasNext()) {
 			((Node) nodeIterator.next()).remove();
@@ -91,7 +92,10 @@ public class BookService {
 	 * @throws RepositoryException
 	 */
 	public List<Book> getBooks() throws RepositoryException {
-		return RepositoryUtil.getBooks(session);
+		List<Book> bookList = RepositoryUtil.getBooks(session);
+		log.debug("{} book(s) found", bookList.size());
+
+		return bookList;
 	}
 
 	/**

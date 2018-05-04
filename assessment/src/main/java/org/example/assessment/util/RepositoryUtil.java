@@ -12,6 +12,7 @@ import javax.jcr.Session;
 import javax.jcr.nodetype.NodeType;
 
 import org.example.assessment.common.Constants;
+import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import com.google.common.collect.Lists;
  */
 public class RepositoryUtil {
 
-	protected final Logger log = LoggerFactory.getLogger(getClass());
+	protected static final Logger log = LoggerFactory.getLogger(RepositoryUtil.class);
 
 	private RepositoryUtil() {
 		// for sonarqube
@@ -41,6 +42,9 @@ public class RepositoryUtil {
 		if (session.getRootNode().hasNode(Constants.REPOSITORY)) {
 			booksNode = session.getRootNode().getNode(Constants.REPOSITORY);
 		} else {
+			log.info("new repository adding");
+			// Test case path not found exception fix
+			addContentRepos(session);
 			booksNode = session.getRootNode().addNode(Constants.REPOSITORY);
 			booksNode.setPrimaryType(NodeType.NT_UNSTRUCTURED);
 		}
@@ -48,16 +52,47 @@ public class RepositoryUtil {
 		return booksNode;
 	}
 
-	public static Book getBook(Session session, String bookName) throws RepositoryException {
+	/**
+	 * ATTENTION: This method for test cases
+	 * 
+	 * @param session
+	 * @throws RepositoryException
+	 */
+	public static void addContentRepos(Session session) throws RepositoryException {
+		addRepository(session, Constants.REPOSITORY_CONTENT);
+		addRepository(session, Constants.REPOSITORY_DOCUMENTS);
+		addRepository(session, Constants.REPOSITORY_DOCUMENTS_PROJECT);
+	}
 
-		Node booksNode = getBooksNode(session);
-
-		Node bookNode = booksNode.getNode(bookName);
-		if (bookNode == null) {
-			return null;
+	public static Node addRepository(Session session, String realPath) throws RepositoryException {
+		if (!session.getRootNode().hasNode(realPath)) {
+			return session.getRootNode().addNode(realPath);
+		} else {
+			return session.getRootNode().getNode(realPath);
 		}
-		
-		return BookUtil.toBook(bookNode);
+	}
+
+	public static Book getBookByPath(Session session, String bookRealPath) {
+		try {
+			// path can not start with "/" under root node. Remove "/"If
+			// bookRealPath is starting with "/"
+			String bookPath = bookRealPath.startsWith(Constants.PATH_SEPARATOR)
+					? bookRealPath.replaceFirst(Constants.PATH_SEPARATOR, "") : bookRealPath;
+
+			// receive book from repository
+			Node bookNode = session.getRootNode().getNode(bookPath);
+			if (bookNode == null) {
+				return null;
+			}
+
+			// convert book node to Book
+			return BookUtil.toBook(bookNode);
+
+		} catch (Exception e) {
+			log.error("", BookException.newInstance("error while getBookByPath", e));
+		}
+
+		return null;
 	}
 
 	/**

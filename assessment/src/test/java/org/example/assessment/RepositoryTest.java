@@ -4,20 +4,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.jcr.*;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
+import javax.jcr.PropertyType;
+import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
 import org.onehippo.repository.testutils.RepositoryTestCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
@@ -109,7 +110,8 @@ public class RepositoryTest extends RepositoryTestCase {
 	 * @return
 	 * @throws RepositoryException
 	 */
-	private String toString(Property property, int deep) throws RepositoryException, IllegalStateException, IOException {
+	private String toString(Property property, int deep)
+			throws RepositoryException, IllegalStateException, IOException {
 		String propertyValue;
 		if (property.isMultiple()) {
 			propertyValue = Arrays.toString(Lists.newArrayList(property.getValues()).parallelStream().map(v -> {
@@ -124,9 +126,9 @@ public class RepositoryTest extends RepositoryTestCase {
 				}
 				return "";
 			}).collect(Collectors.toList()).toArray());
-		} else if(property.getType() == PropertyType.BINARY){
+		} else if (property.getType() == PropertyType.BINARY) {
 			propertyValue = property.getBinary().toString();
-		} else{
+		} else {
 			propertyValue = property.getValue().getString();
 
 		}
