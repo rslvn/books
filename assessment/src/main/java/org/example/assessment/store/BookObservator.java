@@ -4,6 +4,7 @@
 package org.example.assessment.store;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -21,8 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author resulav
- *
+ * Created by resulav on 04.05.2018.
  */
 public class BookObservator {
 	protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -59,6 +59,10 @@ public class BookObservator {
 		}
 	};
 
+	/**
+	 * 
+	 * @param builder
+	 */
 	private BookObservator(Builder builder) {
 		this.session = builder.session;
 		try {
@@ -72,13 +76,16 @@ public class BookObservator {
 	}
 
 	/**
+	 * remove book from store
+	 * 
 	 * @param bookpath
+	 *            book real path
 	 */
 	private void removeBook(String bookpath) {
-
+		// get bookId from book path. The last part of path is bookId
+		// /content/documents/myhippoproject/books/1090da58-0b99-422d-add9-f8d676fd3948
 		String bookId = bookpath.substring(bookpath.lastIndexOf(Constants.PATH_SEPARATOR) + 1);
 		BookCache.getInstance().removeBook(bookId);
-
 		log.debug("Book removed from store by bookId {}", bookId);
 	}
 
@@ -88,9 +95,11 @@ public class BookObservator {
 	 * @param bookPath
 	 */
 	private void loadBookByBookPath(String bookPath) {
-		Book book = RepositoryUtil.getBookByPath(session, bookPath);
-		if (book != null) {
-			BookCache.getInstance().addOrUpdateBook(book);
+		// get book from repository by real path
+		Optional<Book> bookOptional = RepositoryUtil.getBookByPath(session, bookPath);
+		if (bookOptional.isPresent()) {
+			// put book to cache
+			BookCache.getInstance().addOrUpdateBook(bookOptional.get());
 			log.debug("{} is stored", bookPath);
 		} else {
 			log.debug("No book in repository by {}", bookPath);
@@ -122,7 +131,7 @@ public class BookObservator {
 		log.debug("{} book(s) stored", BookCache.getInstance().getBookList().size());
 	}
 
-	/**
+	/** returns event name by event type
 	 * @param e
 	 * @return
 	 */
@@ -175,8 +184,7 @@ public class BookObservator {
 		 *         {@code BookStore.Builder}
 		 */
 		public BookObservator build() {
-			Preconditions.checkNotNull(session, "");
-
+			Preconditions.checkNotNull(session, "session canot be null");
 			return new BookObservator(this);
 		}
 	}

@@ -27,6 +27,7 @@ public class BookStoreResources {
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 
 	public BookStoreResources() {
+		// for sonarqube
 	}
 
 	/**
@@ -41,11 +42,8 @@ public class BookStoreResources {
 	public List<Book> getStoredBooks() {
 		try {
 			log.debug("getStoredBooks service is called");
-
 			List<Book> bookList = BookCache.getInstance().getBookList();
-
 			log.debug("{} stored book(s) found", bookList.size());
-
 			return bookList;
 		} catch (BookException e) {
 			log.error("", e);

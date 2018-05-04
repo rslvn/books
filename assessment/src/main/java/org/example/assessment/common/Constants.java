@@ -9,6 +9,10 @@ package org.example.assessment.common;
  */
 public class Constants {
 
+	private Constants() {
+		// sonarqube
+	}
+
 	public static final String REPOSITORY_CONTENT = "content";
 	public static final String REPOSITORY_DOCUMENTS = "content/documents";
 	public static final String REPOSITORY_DOCUMENTS_PROJECT = "content/documents/myhippoproject";

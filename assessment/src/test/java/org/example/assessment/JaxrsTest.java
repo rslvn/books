@@ -202,11 +202,11 @@ public class JaxrsTest extends RepositoryTestCase {
 	@Test(expected = RuntimeException.class)
 	public void test10AddBooksException() throws Exception {
 		BookService bookService = EasyMock. createMock(BookService.class);
-        bookService.saveBooks(bookList);
+        bookService.addBooks(bookList);
 		EasyMock.expectLastCall().andThrow(new RuntimeException());
 		EasyMock.replay(bookService);
 
-        bookService.saveBooks(bookList);
+        bookService.addBooks(bookList);
 
 		boolean addResult = addBooks(bookList);
 		Assert.assertFalse("addBooks result failed", addResult);

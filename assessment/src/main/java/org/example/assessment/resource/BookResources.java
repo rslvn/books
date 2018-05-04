@@ -40,7 +40,6 @@ public class BookResources {
 
 	public BookResources(Session session) {
 		bookService = new BookService(session);
-
 		BookObservator.newBuilder().withSession(session).build();
 	}
 
@@ -64,11 +63,10 @@ public class BookResources {
 				validateBook(b);
 				b.setBookId(UUID.randomUUID().toString());
 			});
-
+			
 			log.debug("Book size: {}", books.size());
 			// call service
-			bookService.saveBooks(books);
-
+			bookService.addBooks(books);
 			return true;
 
 		} catch (BookException e) {

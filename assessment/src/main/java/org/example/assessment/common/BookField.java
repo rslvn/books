@@ -17,7 +17,7 @@ public enum BookField {
 	
 	private final String fieldName;
 
-	private BookField(String fieldName) {
+	BookField(String fieldName) {
 		this.fieldName = fieldName;
 	}
 

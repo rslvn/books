@@ -1,12 +1,17 @@
 package org.example.assessment.util;
 
+import java.util.List;
+
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
 
 import org.example.assessment.common.BookField;
-import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 /**
  * Created by resulav on 02.05.2018.
@@ -20,45 +25,52 @@ public class BookUtil {
 	}
 
 	/**
-	 * Converts node to Book. It throws a BookException If something is wrong
+	 * Converts nodeIterator to Book list.
 	 *
-	 * @param node
+	 * @param nodeIterator
 	 * @return a {@link Book} instance
+	 * @throws RepositoryException 
 	 */
-	public static Book toBook(Node node) {
-		try {
-			Book book = new Book();
-			book.setBookId(node.getName());
-			book.setName(node.getProperty(BookField.NAME.getFieldName()).getString());
-			book.setAuthor(node.getProperty(BookField.AUTHOR.getFieldName()).getString());
-			book.setIsbn(node.getProperty(BookField.ISBN.getFieldName()).getString());
-			book.setIntroduction(node.getProperty(BookField.INTRODUCTION.getFieldName()).getString());
-			book.setParagraphs(node.getProperty(BookField.PARAGRAPHS.getFieldName()).getString());
-
-			return book;
-
-		} catch (Exception e) {
-			throw BookException.newInstance("Error while toBook process", e);
+	public static List<Book> toBookList(NodeIterator nodeIterator) throws RepositoryException {
+		List<Book> books = Lists.newArrayList();
+		while (nodeIterator.hasNext()) {
+			books.add(BookUtil.toBook(nodeIterator.nextNode()));
 		}
+		return books;
 	}
 
 	/**
-	 * Converts Book to node. It throws a BookException If something is wrong
+	 * Converts node to Book.
+	 *
+	 * @param node
+	 * @return a {@link Book} instance
+	 * @throws RepositoryException
+	 */
+	public static Book toBook(Node node) throws RepositoryException {
+		Book book = new Book();
+		book.setBookId(node.getName());
+		book.setName(node.getProperty(BookField.NAME.getFieldName()).getString());
+		book.setAuthor(node.getProperty(BookField.AUTHOR.getFieldName()).getString());
+		book.setIsbn(node.getProperty(BookField.ISBN.getFieldName()).getString());
+		book.setIntroduction(node.getProperty(BookField.INTRODUCTION.getFieldName()).getString());
+		book.setParagraphs(node.getProperty(BookField.PARAGRAPHS.getFieldName()).getString());
+
+		return book;
+	}
+
+	/**
+	 * Converts Book to node.
 	 * 
 	 * @param book
 	 * @param bookNode
+	 * @throws RepositoryException
 	 */
-	public static void toNode(Book book, Node bookNode) {
-		try {
-			bookNode.setProperty(BookField.NAME.getFieldName(), book.getName());
-			bookNode.setProperty(BookField.AUTHOR.getFieldName(), book.getAuthor());
-			bookNode.setProperty(BookField.ISBN.getFieldName(), book.getIsbn());
-			bookNode.setProperty(BookField.INTRODUCTION.getFieldName(), book.getIntroduction());
-			bookNode.setProperty(BookField.PARAGRAPHS.getFieldName(), book.getParagraphs());
-
-		} catch (Exception e) {
-			throw BookException.newInstance("Error while toNode process", e);
-		}
+	public static void toNode(Book book, Node bookNode) throws RepositoryException {
+		bookNode.setProperty(BookField.NAME.getFieldName(), book.getName());
+		bookNode.setProperty(BookField.AUTHOR.getFieldName(), book.getAuthor());
+		bookNode.setProperty(BookField.ISBN.getFieldName(), book.getIsbn());
+		bookNode.setProperty(BookField.INTRODUCTION.getFieldName(), book.getIntroduction());
+		bookNode.setProperty(BookField.PARAGRAPHS.getFieldName(), book.getParagraphs());
 	}
 
 }

@@ -4,9 +4,9 @@
 package org.example.assessment.util;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.nodetype.NodeType;
@@ -16,8 +16,6 @@ import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author resulav
@@ -64,6 +62,16 @@ public class RepositoryUtil {
 		addRepository(session, Constants.REPOSITORY_DOCUMENTS_PROJECT);
 	}
 
+	/**
+	 * checks repository, adds a new repository if path not exists
+	 * 
+	 * @param session
+	 *            system session
+	 * @param realPath
+	 *            path of repository
+	 * @return
+	 * @throws RepositoryException
+	 */
 	public static Node addRepository(Session session, String realPath) throws RepositoryException {
 		if (!session.getRootNode().hasNode(realPath)) {
 			return session.getRootNode().addNode(realPath);
@@ -72,27 +80,38 @@ public class RepositoryUtil {
 		}
 	}
 
-	public static Book getBookByPath(Session session, String bookRealPath) {
+	/**
+	 * Gets book by real path
+	 * 
+	 * @param session
+	 *            session system session
+	 * @param bookRealPath
+	 *            path of book
+	 * @return an instance of {@link Book} If path exists
+	 */
+	public static Optional<Book> getBookByPath(Session session, String bookRealPath) {
 		try {
 			// path can not start with "/" under root node. Remove "/"If
 			// bookRealPath is starting with "/"
 			String bookPath = bookRealPath.startsWith(Constants.PATH_SEPARATOR)
 					? bookRealPath.replaceFirst(Constants.PATH_SEPARATOR, "") : bookRealPath;
 
-			// receive book from repository
-			Node bookNode = session.getRootNode().getNode(bookPath);
-			if (bookNode == null) {
-				return null;
+			Node rootNode = session.getRootNode();
+			if (!rootNode.hasNode(bookPath)) {
+				return Optional.empty();
 			}
 
+			// receive book from repository
+			Node bookNode = session.getRootNode().getNode(bookPath);
+
 			// convert book node to Book
-			return BookUtil.toBook(bookNode);
+			return Optional.of(BookUtil.toBook(bookNode));
 
 		} catch (Exception e) {
 			log.error("", BookException.newInstance("error while getBookByPath", e));
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	/**
@@ -101,17 +120,7 @@ public class RepositoryUtil {
 	 * @throws RepositoryException
 	 */
 	public static List<Book> getBooks(Session session) throws RepositoryException {
-
-		List<Book> books = Lists.newArrayList();
-
 		Node booksNode = getBooksNode(session);
-		NodeIterator nodeIterator = booksNode.getNodes();
-
-		while (nodeIterator.hasNext()) {
-			Node node = nodeIterator.nextNode();
-			books.add(BookUtil.toBook(node));
-		}
-
-		return books;
+		return BookUtil.toBookList(booksNode.getNodes());
 	}
 }

@@ -58,7 +58,7 @@ public class BookCache {
 	}
 
 	/**
-	 * removes the book from cache by bookId
+	 * Removes the book from cache by bookId
 	 * 
 	 * @param bookId
 	 *            the bookId of the removing book
