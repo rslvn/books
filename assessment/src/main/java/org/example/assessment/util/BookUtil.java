@@ -17,9 +17,6 @@ import com.google.common.collect.Lists;
  * Created by resulav on 02.05.2018.
  */
 public class BookUtil {
-
-	protected final Logger log = LoggerFactory.getLogger(getClass());
-
 	private BookUtil() {
 		// for sonarqube
 	}

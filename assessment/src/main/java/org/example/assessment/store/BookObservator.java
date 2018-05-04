@@ -62,6 +62,7 @@ public class BookObservator {
 	/**
 	 * 
 	 * @param builder
+	 *            builder of {@link BookObservator}
 	 */
 	private BookObservator(Builder builder) {
 		this.session = builder.session;
@@ -79,7 +80,7 @@ public class BookObservator {
 	 * remove book from store
 	 * 
 	 * @param bookpath
-	 *            book real path
+	 *            the real path of book
 	 */
 	private void removeBook(String bookpath) {
 		// get bookId from book path. The last part of path is bookId
@@ -93,8 +94,11 @@ public class BookObservator {
 	 * gets the book from repository and puts it in store
 	 * 
 	 * @param bookPath
+	 *            the real path of book
+	 * @throws RepositoryException
+	 *             as generic exception
 	 */
-	private void loadBookByBookPath(String bookPath) {
+	private void loadBookByBookPath(String bookPath) throws RepositoryException {
 		// get book from repository by real path
 		Optional<Book> bookOptional = RepositoryUtil.getBookByPath(session, bookPath);
 		if (bookOptional.isPresent()) {
@@ -111,15 +115,18 @@ public class BookObservator {
 	 * gets the book from repository and puts it in store
 	 * 
 	 * @param propertyPath
+	 *            real path of property
+	 * @throws RepositoryException
+	 *             as generic exception
 	 */
-	private void loadBookByPropertyPath(String propertyPath) {
+	private void loadBookByPropertyPath(String propertyPath) throws RepositoryException {
 		loadBookByBookPath(propertyPath.substring(0, propertyPath.lastIndexOf('/')));
 	}
 
 	/**
 	 * gets books from repository and puts them in store
 	 * 
-	 * @throws RepositoryException
+	 * @throws RepositoryException as generic exception
 	 */
 	private void loadBooks() throws RepositoryException {
 		List<Book> bookList = RepositoryUtil.getBooks(session);
@@ -131,9 +138,12 @@ public class BookObservator {
 		log.debug("{} book(s) stored", BookCache.getInstance().getBookList().size());
 	}
 
-	/** returns event name by event type
+	/**
+	 * returns event name by event type
+	 * 
 	 * @param e
-	 * @return
+	 *            jcr event
+	 * @return name of event
 	 */
 	private String getEventName(Event e) {
 		switch (e.getType()) {

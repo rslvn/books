@@ -107,49 +107,28 @@ public class Book {
 		this.paragraphs = paragraphs;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((bookId == null) ? 0 : bookId.hashCode());
-		return result;
-	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object o) {
+		if (this == o)
 			return true;
-		}
-		if (obj == null) {
+		if (o == null || getClass() != o.getClass())
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Book other = (Book) obj;
-		if (bookId == null) {
-			if (other.bookId != null) {
-				return false;
-			}
-		} else if (!bookId.equals(other.bookId)) {
-			return false;
-		}
-		return true;
+
+		Book book = (Book) o;
+
+		return bookId != null ? bookId.equals(book.bookId) : book.bookId == null;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

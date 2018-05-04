@@ -168,7 +168,7 @@ public class BookResources {
 	/**
 	 * Adds books to repository
 	 *
-	 * @param books
+	 * @param book
 	 *            as list of {@link Book}
 	 * @return true/false
 	 */
