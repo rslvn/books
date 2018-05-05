@@ -1,8 +1,5 @@
 # Dependency: pojo-tester
 
-The dependency is already added to **pom.xml** of `prognet-contoller`.
-> *__You don't need to add again it__*.
-
 ```
 <repositories>
 <repository>
