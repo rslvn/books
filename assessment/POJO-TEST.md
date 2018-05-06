@@ -57,4 +57,4 @@ To test BookTest.java pojo class. Add a test class and add following codes in th
 ```
 
 
-Full example:   [BookTest.java](./src/test/java/org.example/myhippoproject/model/BookTest.java)
+Full example:   [ModelTest.java](./src/test/java/org/example/assessment/model/ModelTest.java)
