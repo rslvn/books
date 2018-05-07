@@ -14,6 +14,7 @@ import javax.jcr.observation.EventListener;
 
 import org.apache.cxf.common.util.CollectionUtils;
 import org.example.assessment.common.Constants;
+import org.example.assessment.common.ResultCode;
 import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
 import org.example.assessment.util.Preconditions;
@@ -54,7 +55,7 @@ public class BookObservator {
 					break;
 				}
 			} catch (Exception e) {
-				log.error("", BookException.newInstance("onEvent error", e));
+				log.error("", BookException.newInstance(ResultCode.FAILED,"onEvent error", e));
 			}
 		}
 	};
@@ -72,7 +73,7 @@ public class BookObservator {
 					Event.NODE_ADDED | Event.NODE_REMOVED | Event.PROPERTY_CHANGED,
 					Constants.PATH_SEPARATOR + Constants.REPOSITORY, true, null, null, false);
 		} catch (Exception e) {
-			throw BookException.newInstance("Error while setting up node EventListener", e);
+			throw BookException.newInstance(ResultCode.FAILED, "Error while setting up node EventListener", e);
 		}
 	}
 

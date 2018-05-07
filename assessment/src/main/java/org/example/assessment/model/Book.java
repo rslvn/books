@@ -1,7 +1,5 @@
 package org.example.assessment.model;
 
-import java.util.List;
-
 /**
  * Created by resulav on 02.05.2018.
  */
@@ -108,7 +106,6 @@ public class Book {
 	public void setParagraphs(String[] paragraphs) {
 		this.paragraphs = paragraphs;
 	}
-
 
 	/*
 	 * (non-Javadoc)

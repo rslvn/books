@@ -9,8 +9,9 @@ import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 
-import org.example.assessment.common.BookField;
+import org.apache.commons.lang3.StringUtils;
 import org.example.assessment.common.Constants;
+import org.example.assessment.common.ResultCode;
 import org.example.assessment.model.Book;
 import org.example.assessment.util.BookUtil;
 import org.example.assessment.util.Preconditions;
@@ -25,6 +26,7 @@ public class BookService {
 
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 
+	private final String QUERY_PREFIX = StringUtils.join("/jcr:root/", Constants.REPOSITORY, "//(*,nt:unstructured)");
 	private final Session session;
 
 	public BookService(Session session) {
@@ -58,12 +60,12 @@ public class BookService {
 	public void updateBook(Book book) throws RepositoryException {
 		Node booksNode = RepositoryUtil.getBooksNode(session);
 		// validate the book exists or not
-		Preconditions.checkArgument(booksNode.hasNode(book.getBookId()),
-				String.format("No boot to update by bookId: %s", book.getBookId()));
+		Preconditions.checkArgument(booksNode.hasNode(book.getBookId()), ResultCode.NOT_FOUND,
+				String.format("No book found by bookId: %s", book.getBookId()));
 
 		// get book node and set properties
 		Node bookNode = booksNode.getNode(book.getBookId());
-		BookUtil.toNode(book, bookNode);
+		BookUtil.toNodeForUpdate(book, bookNode);
 
 		session.save();
 	}
@@ -76,7 +78,8 @@ public class BookService {
 		Node booksNode = RepositoryUtil.getBooksNode(session);
 
 		NodeIterator nodeIterator = booksNode.getNodes(bookId);
-		Preconditions.checkArgument(nodeIterator.getSize() > 0, String.format("no book found by bookId: %s", bookId));
+		Preconditions.checkArgument(nodeIterator.getSize() > 0, ResultCode.NOT_FOUND,
+				String.format("No book found by bookId: %s", bookId));
 
 		while (nodeIterator.hasNext()) {
 			((Node) nodeIterator.next()).remove();
@@ -105,19 +108,59 @@ public class BookService {
 	 * @return list of books
 	 * @throws RepositoryException
 	 */
+	public List<Book> searchBooksByContains(String text) throws RepositoryException {
+		log.info("Searching books contains text: {}", text);
+
+		String queryText = StringUtils.join(QUERY_PREFIX, "[jcr:contains(.,'", text, "')]");
+
+		return queryBooks(queryText);
+	}
+
+	/**
+	 * Searches books containing text as case in-sensitive
+	 *
+	 * @param text
+	 * @return list of books
+	 * @throws RepositoryException
+	 */
+	public List<Book> searchBooksByLike(String text) throws RepositoryException {
+		log.info("Searching books contains text: {}", text);
+
+		String queryText = StringUtils.join(QUERY_PREFIX, "[jcr:like(@name,'%", text, "%') or jcr:like(@isbn,'%", text,
+				"%')or jcr:like(@author,'%", text, "%') or jcr:like(@paragraphs,'%", text,
+				"%') or jcr:like(@introduction,'%", text, "%')]");
+
+		return queryBooks(queryText);
+	}
+
+	/**
+	 * Searches books containing text as case in-sensitive
+	 *
+	 * @param isbn
+	 * @return list of books
+	 * @throws RepositoryException
+	 */
+	public List<Book> queryBooksByISBN(String isbn) throws RepositoryException {
+		log.info("Searching books contains ISBN: {}", isbn);
+
+		String queryText = StringUtils.join(QUERY_PREFIX, "[@isbn='", isbn, "']");
+
+		return queryBooks(queryText);
+	}
+
+	/**
+	 * Searches books containing text as case in-sensitive
+	 *
+	 * @param queryText
+	 * @return list of books
+	 * @throws RepositoryException
+	 */
 	@SuppressWarnings("deprecation")
-	public List<Book> queryBooks(String text) throws RepositoryException {
-		log.info("Searching books contains {}", text);
-
-        String queryText = "/jcr:root/"+ Constants.REPOSITORY+"//*[jcr:contains(.,'" + text + "')]";
-
-		log.info("QUERY: {}",queryText);
+	private List<Book> queryBooks(String queryText) throws RepositoryException {
+		log.debug("QUERY: {}", queryText);
 		// Query repository for the books containing text
-		Query query = session.getWorkspace().getQueryManager().createQuery(queryText
-				,Query.XPATH);
-		// execute query
+		Query query = session.getWorkspace().getQueryManager().createQuery(queryText, Query.XPATH);
 		QueryResult queryResult = query.execute();
-		//log.info("Search result size: {}", queryResult.si);
 
 		return BookUtil.toBookList(queryResult.getNodes());
 	}

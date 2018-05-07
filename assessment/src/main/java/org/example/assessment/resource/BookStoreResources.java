@@ -8,6 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.example.assessment.common.Constants;
+import org.example.assessment.common.ResultCode;
 import org.example.assessment.exception.BookException;
 import org.example.assessment.model.Book;
 import org.example.assessment.store.BookCache;
@@ -48,7 +50,8 @@ public class BookStoreResources {
 		} catch (BookException e) {
 			log.error("", e);
 		} catch (Exception e) {
-			log.error("", BookException.newInstance("Error while getStoredBooks", e));
+			log.error("Error while getStoredBooks",
+					BookException.newInstance(ResultCode.FAILED, Constants.ERROR_INTERNAL, e));
 		} finally {
 			log.debug("getStoredBooks executed");
 		}

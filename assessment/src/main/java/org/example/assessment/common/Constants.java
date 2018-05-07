@@ -20,5 +20,7 @@ public class Constants {
 	public static final String PATH_SEPARATOR = "/";
 
 	public static final int ISBN_SIZE = 13;
+	
+	public static final String ERROR_INTERNAL = "Internal Error";
 
 }

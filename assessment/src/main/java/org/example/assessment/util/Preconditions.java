@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.util.CollectionUtils;
+import org.example.assessment.common.ResultCode;
 import org.example.assessment.exception.BookException;
 
 /**
@@ -12,19 +13,32 @@ import org.example.assessment.exception.BookException;
  */
 public class Preconditions {
 
-	private Preconditions() {
+	public Preconditions() {
 		// for sonarqube
 	}
 
 	/**
-	 * Ensures the truth of an expression involving one or more parameters to the calling method.
+	 * Ensures the truth of an expression involving one or more parameters to
+	 * the calling method.
 	 *
 	 * @param expression
 	 * @param errorMessage
 	 */
 	public static void checkArgument(boolean expression, String errorMessage) {
+		checkArgument(expression, ResultCode.VALIDATION_FAILED, errorMessage);
+	}
+
+	/**
+	 * Ensures the truth of an expression involving one or more parameters to
+	 * the calling method.
+	 *
+	 * @param expression
+	 * @param resultCode
+	 * @param errorMessage
+	 */
+	public static void checkArgument(boolean expression, ResultCode resultCode, String errorMessage) {
 		if (!expression) {
-			throw BookException.newInstance(errorMessage);
+			throw BookException.newInstance(resultCode, errorMessage);
 		}
 	}
 
@@ -38,7 +52,7 @@ public class Preconditions {
 	 */
 	public static <T> T checkNotNull(T reference, String errorMessage) {
 		if (reference == null) {
-			throw BookException.newInstance(errorMessage);
+			throw BookException.newInstance(ResultCode.VALIDATION_FAILED, errorMessage);
 		}
 		return reference;
 	}
@@ -52,7 +66,21 @@ public class Preconditions {
 	 */
 	public static <T> void checkNotEmpty(Collection<T> reference, String errorMessage) {
 		if (CollectionUtils.isEmpty(reference)) {
-			throw BookException.newInstance(errorMessage);
+			throw BookException.newInstance(ResultCode.VALIDATION_FAILED, errorMessage);
+		}
+	}
+
+	/**
+	 * Ensures that an object reference passed as a parameter to the calling
+	 * method is null or empty.
+	 *
+	 * @param reference
+	 * @param resultCode
+	 * @param errorMessage
+	 */
+	public static <T> void checkEmpty(Collection<T> reference, ResultCode resultCode, String errorMessage) {
+		if (!CollectionUtils.isEmpty(reference)) {
+			throw BookException.newInstance(resultCode, errorMessage);
 		}
 	}
 
@@ -65,7 +93,7 @@ public class Preconditions {
 	 */
 	public static <T> void checkNotEmpty(T[] reference, String errorMessage) {
 		if (ArrayUtils.isEmpty(reference)) {
-			throw BookException.newInstance(errorMessage);
+			throw BookException.newInstance(ResultCode.VALIDATION_FAILED, errorMessage);
 		}
 	}
 
@@ -81,7 +109,7 @@ public class Preconditions {
 		String value = StringUtils.trimToNull(reference);
 
 		if (value == null) {
-			throw BookException.newInstance(errorMessage);
+			throw BookException.newInstance(ResultCode.VALIDATION_FAILED, errorMessage);
 		}
 
 		return value;
