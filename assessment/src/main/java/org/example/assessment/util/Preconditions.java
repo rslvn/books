@@ -2,6 +2,7 @@ package org.example.assessment.util;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.example.assessment.exception.BookException;
@@ -51,6 +52,19 @@ public class Preconditions {
 	 */
 	public static <T> void checkNotEmpty(Collection<T> reference, String errorMessage) {
 		if (CollectionUtils.isEmpty(reference)) {
+			throw BookException.newInstance(errorMessage);
+		}
+	}
+
+	/**
+	 * Ensures that an object reference passed as a parameter to the calling
+	 * method is not null or empty.
+	 *
+	 * @param reference
+	 * @param errorMessage
+	 */
+	public static <T> void checkNotEmpty(T[] reference, String errorMessage) {
+		if (ArrayUtils.isEmpty(reference)) {
 			throw BookException.newInstance(errorMessage);
 		}
 	}

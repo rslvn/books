@@ -10,6 +10,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 
 import org.example.assessment.common.BookField;
+import org.example.assessment.common.Constants;
 import org.example.assessment.model.Book;
 import org.example.assessment.util.BookUtil;
 import org.example.assessment.util.Preconditions;
@@ -107,15 +108,16 @@ public class BookService {
 	@SuppressWarnings("deprecation")
 	public List<Book> queryBooks(String text) throws RepositoryException {
 		log.info("Searching books contains {}", text);
-		// toLowerCase to search case in-sensitive
-		final String lowerQueryText = text.toLowerCase();
+
+        String queryText = "/jcr:root/"+ Constants.REPOSITORY+"//*[jcr:contains(.,'" + text + "')]";
+
+		log.info("QUERY: {}",queryText);
 		// Query repository for the books containing text
-		Query query = session.getWorkspace().getQueryManager().createQuery(
-				"//*[jcr:like(fn:lower-case(@" + BookField.PARAGRAPHS.getFieldName() + "),'%" + lowerQueryText + "%')]",
-				Query.XPATH);
+		Query query = session.getWorkspace().getQueryManager().createQuery(queryText
+				,Query.XPATH);
 		// execute query
 		QueryResult queryResult = query.execute();
-		log.info("Search result size: {}", queryResult.getNodes().getSize());
+		//log.info("Search result size: {}", queryResult.si);
 
 		return BookUtil.toBookList(queryResult.getNodes());
 	}

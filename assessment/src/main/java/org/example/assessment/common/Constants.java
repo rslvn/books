@@ -19,4 +19,6 @@ public class Constants {
 	public static final String REPOSITORY = "content/documents/myhippoproject/books";
 	public static final String PATH_SEPARATOR = "/";
 
+	public static final int ISBN_SIZE = 13;
+
 }

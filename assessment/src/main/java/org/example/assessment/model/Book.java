@@ -1,5 +1,7 @@
 package org.example.assessment.model;
 
+import java.util.List;
+
 /**
  * Created by resulav on 02.05.2018.
  */
@@ -13,9 +15,9 @@ public class Book {
 
 	private String isbn;
 
-	private String introduction;
+	private String[] introduction;
 
-	private String paragraphs;
+	private String[] paragraphs;
 
 	/**
 	 * @return the bookId
@@ -80,7 +82,7 @@ public class Book {
 	/**
 	 * @return the introduction
 	 */
-	public String getIntroduction() {
+	public String[] getIntroduction() {
 		return introduction;
 	}
 
@@ -88,14 +90,14 @@ public class Book {
 	 * @param introduction
 	 *            the introduction to set
 	 */
-	public void setIntroduction(String introduction) {
+	public void setIntroduction(String[] introduction) {
 		this.introduction = introduction;
 	}
 
 	/**
 	 * @return the paragraphs
 	 */
-	public String getParagraphs() {
+	public String[] getParagraphs() {
 		return paragraphs;
 	}
 
@@ -103,7 +105,7 @@ public class Book {
 	 * @param paragraphs
 	 *            the paragraphs to set
 	 */
-	public void setParagraphs(String paragraphs) {
+	public void setParagraphs(String[] paragraphs) {
 		this.paragraphs = paragraphs;
 	}
 
