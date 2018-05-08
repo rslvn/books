@@ -161,7 +161,7 @@ public class BookUtil {
 	 * @return as String array of the property values
 	 * @throws RepositoryException
 	 */
-	private static String[] toStringArray(Property property, String propertyName) throws RepositoryException {
+	public static String[] toStringArray(Property property, String propertyName) throws RepositoryException {
 		if (!property.isMultiple()) {
 			return ArrayUtils.toArray(property.getString());
 		}

@@ -3,24 +3,30 @@ package org.example.assessment;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Base64;
 
+import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
-import javax.jcr.ValueFormatException;
+import javax.jcr.Value;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.example.assessment.common.Constants;
+import org.example.assessment.common.ResultCode;
+import org.example.assessment.exception.BookException;
+import org.example.assessment.util.BookUtil;
 import org.junit.After;
 import org.junit.Test;
 import org.onehippo.repository.testutils.RepositoryTestCase;
-
-import com.google.common.collect.Lists;
 
 public class RepositoryTest extends RepositoryTestCase {
 
@@ -114,20 +120,9 @@ public class RepositoryTest extends RepositoryTestCase {
 			throws RepositoryException, IllegalStateException, IOException {
 		String propertyValue;
 		if (property.isMultiple()) {
-			propertyValue = Arrays.toString(Lists.newArrayList(property.getValues()).parallelStream().map(v -> {
-				try {
-					return v.getString();
-				} catch (ValueFormatException e) {
-					e.printStackTrace();
-				} catch (IllegalStateException e) {
-					e.printStackTrace();
-				} catch (RepositoryException e) {
-					e.printStackTrace();
-				}
-				return "";
-			}).collect(Collectors.toList()).toArray());
+			propertyValue = Arrays.toString(BookUtil.toStringArray(property, property.getName()));
 		} else if (property.getType() == PropertyType.BINARY) {
-			propertyValue = property.getBinary().toString();
+			propertyValue = convert(property.getValue());
 		} else {
 			propertyValue = property.getValue().getString();
 
@@ -136,5 +131,28 @@ public class RepositoryTest extends RepositoryTestCase {
 		String text = String.format(PROPRTY_VALUE_FORMATTER, property.getName(), propertyValue);
 
 		return StringUtils.leftPad(text, text.length() + deep);
+	}
+
+	/**
+	 * @param value
+	 * @return
+	 * @throws IOException
+	 * @throws RepositoryException
+	 */
+	private String convert(Value value) throws IOException, RepositoryException {
+		Binary bv = value.getBinary();
+		InputStream is = bv.getStream();
+		try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+			int b = 0;
+			while (b != -1) {
+				b = is.read();
+				if (b != -1) {
+					bout.write(b);
+				}
+			}
+			return Base64.getEncoder().encodeToString(bout.toByteArray());
+		} catch (Exception e) {
+			throw BookException.newInstance(ResultCode.FAILED, Constants.ERROR_INTERNAL, e);
+		}
 	}
 }
