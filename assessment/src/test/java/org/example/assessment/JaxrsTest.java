@@ -50,10 +50,11 @@ import com.jayway.restassured.specification.RequestSpecification;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JaxrsTest extends RepositoryTestCase {
 
-	private static final String NAME_BOOK1 = "nameBook1";
+	private static final String NAME_BOOK1 = "nameBook1'";
 	private static final String NAME_BOOK2 = "nameBook2";
 	private static final String NAME_BOOK3 = "nameBook3";
 	private static final String QUERY_TEXT = "introduction";
+	private static final String QUERY_ESCAPE_CHARS = "'%";
 
 	private static final String NAME_UPDATED = "nameUpdated";
 
@@ -92,7 +93,7 @@ public class JaxrsTest extends RepositoryTestCase {
 		book1 = createBook(NAME_BOOK1, "authorBook1", "95-8929-675-1",
 				ArrayUtils.toArray("introduction paragraph11", "introduction paragraph12"),
 				ArrayUtils.toArray("book paragraph11", "book paragraph12", "book paragraph13"));
-		book2 = createBook(NAME_BOOK2, "authorBook2", "95-8929-675-2",
+		book2 = createBook(NAME_BOOK2, "authorBook2 "+QUERY_ESCAPE_CHARS, "95-8929-675-2",
 				ArrayUtils.toArray("introduction paragraph21", "introduction paragraph22"),
 				ArrayUtils.toArray("book paragraph21", "book paragraph22", "book paragraph23"));
 		book3 = createBook(NAME_BOOK3, "authorBook3", "95-8929-675-3",
@@ -232,16 +233,28 @@ public class JaxrsTest extends RepositoryTestCase {
 	 */
 	@Test
 	public void test6_SearchBook_Success() throws Exception {
+		searchBookInternal(QUERY_TEXT);
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void test6_SearchBook_EscapeChars() throws Exception {
+		searchBookInternal(QUERY_ESCAPE_CHARS);
+	}
+	
+	private void searchBookInternal(String queryText) throws Exception {
 		Book[] books = getBooksNotEmpty();
-		Book[] booksSearchResult = searchBooks(QUERY_TEXT);
+		Book[] booksSearchResult = searchBooks(queryText);
 
 		List<Book> booksSearchResultList = Lists.newArrayList(booksSearchResult);
 
 		List<Book> booksHaveQueryTextList = Arrays.stream(books).filter(b -> StringUtils.containsIgnoreCase(b.getName(),
-				QUERY_TEXT) || StringUtils.containsIgnoreCase(b.getIsbn(), QUERY_TEXT)
-				|| StringUtils.containsIgnoreCase(b.getAuthor(), QUERY_TEXT)
-				|| Arrays.stream(b.getParagraphs()).anyMatch(p -> StringUtils.containsIgnoreCase(p, QUERY_TEXT))
-				|| Arrays.stream(b.getIntroduction()).anyMatch(p -> StringUtils.containsIgnoreCase(p, QUERY_TEXT)))
+				queryText) || StringUtils.containsIgnoreCase(b.getIsbn(), queryText)
+				|| StringUtils.containsIgnoreCase(b.getAuthor(), queryText)
+				|| Arrays.stream(b.getParagraphs()).anyMatch(p -> StringUtils.containsIgnoreCase(p, queryText))
+				|| Arrays.stream(b.getIntroduction()).anyMatch(p -> StringUtils.containsIgnoreCase(p, queryText)))
 
 				.collect(Collectors.toList());
 

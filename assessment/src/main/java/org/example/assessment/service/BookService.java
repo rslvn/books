@@ -111,10 +111,14 @@ public class BookService {
 	public List<Book> searchBooksByContains(String text) throws RepositoryException {
 		log.info("Searching books contains text: {}", text);
 
-		String queryText = StringUtils.join(QUERY_PREFIX, "[jcr:contains(.,'", text, "')]");
+		String escapedText = escapeIllegalXpathSearchChars(text);
+
+		String queryText = StringUtils.join(QUERY_PREFIX, "[jcr:contains(.,'", escapedText, "')]");
 
 		return queryBooks(queryText);
 	}
+
+
 
 	/**
 	 * Searches books containing text as case in-sensitive
@@ -124,11 +128,12 @@ public class BookService {
 	 * @throws RepositoryException
 	 */
 	public List<Book> searchBooksByLike(String text) throws RepositoryException {
-		log.info("Searching books contains text: {}", text);
+        String escapedText = escapeIllegalXpathSearchChars(text);
+		log.info("Searching books contains text: {} escapedText: {}", text,escapedText);
 
-		String queryText = StringUtils.join(QUERY_PREFIX, "[jcr:like(@name,'%", text, "%') or jcr:like(@isbn,'%", text,
-				"%')or jcr:like(@author,'%", text, "%') or jcr:like(@paragraphs,'%", text,
-				"%') or jcr:like(@introduction,'%", text, "%')]");
+		String queryText = StringUtils.join(QUERY_PREFIX, "[jcr:like(@name,'%", escapedText, "%') or jcr:like(@isbn,'%",
+				escapedText, "%')or jcr:like(@author,'%", escapedText, "%') or jcr:like(@paragraphs,'%", escapedText,
+				"%') or jcr:like(@introduction,'%", escapedText, "%')]");
 
 		return queryBooks(queryText);
 	}
@@ -142,8 +147,8 @@ public class BookService {
 	 */
 	public List<Book> queryBooksByISBN(String isbn) throws RepositoryException {
 		log.info("Searching books contains ISBN: {}", isbn);
-
-		String queryText = StringUtils.join(QUERY_PREFIX, "[@isbn='", isbn, "']");
+		String escapedText = escapeIllegalXpathSearchChars(isbn);
+		String queryText = StringUtils.join(QUERY_PREFIX, "[@isbn='", escapedText, "']");
 
 		return queryBooks(queryText);
 	}
@@ -164,5 +169,12 @@ public class BookService {
 
 		return BookUtil.toBookList(queryResult.getNodes());
 	}
-
+	
+	/**
+	 * @param text
+	 * @return
+	 */
+	private String escapeIllegalXpathSearchChars(String text) {
+		return text.replace("'", "''").replace("%","\\%");
+	}
 }
